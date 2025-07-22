@@ -7,9 +7,11 @@ services:
     restart: unless-stopped
     ports:
       - "8002:8000"
+      - "8443:8443"
     volumes:
       - ./data:/app/data
       - ./.env:/app/.env
+      - ./ssl:/app/ssl:ro
     environment:
       - TZ=Europe/Berlin
     labels:

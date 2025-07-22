@@ -381,4 +381,15 @@ async def get_stats():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    # Check if SSL certificates exist
+    ssl_keyfile = "ssl/key.pem"
+    ssl_certfile = "ssl/cert.pem"
+    
+    if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
+        print("Starting with HTTPS on port 8443...")
+        uvicorn.run(app, host="0.0.0.0", port=8443, 
+                   ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)
+    else:
+        print("SSL certificates not found, starting HTTP only on port 8000...")
+        uvicorn.run(app, host="0.0.0.0", port=8000)

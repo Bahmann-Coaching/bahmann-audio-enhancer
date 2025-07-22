@@ -139,6 +139,25 @@ jobs:
             # Create data directories
             mkdir -p data/enhanced
             
+            # Setup SSL certificates
+            mkdir -p ssl
+            
+            # Generate certificate for ai-coustics.janbahmann.de if not exists
+            if [ ! -d "/etc/letsencrypt/live/ai-coustics.janbahmann.de" ]; then
+                echo "Generating SSL certificate for ai-coustics.janbahmann.de..."
+                certbot certonly --standalone --non-interactive --agree-tos \
+                    --email info@janbahmann.de -d ai-coustics.janbahmann.de \
+                    || echo "Certificate generation failed or already exists"
+            fi
+            
+            # Copy certificates
+            if [ -d "/etc/letsencrypt/live/ai-coustics.janbahmann.de" ]; then
+                cp /etc/letsencrypt/live/ai-coustics.janbahmann.de/fullchain.pem ssl/cert.pem
+                cp /etc/letsencrypt/live/ai-coustics.janbahmann.de/privkey.pem ssl/key.pem
+                chmod 600 ssl/key.pem
+                echo "SSL certificates for ai-coustics.janbahmann.de copied successfully"
+            fi
+            
             # Docker deployment
             echo "Stopping and removing old containers..."
             docker compose down || true
