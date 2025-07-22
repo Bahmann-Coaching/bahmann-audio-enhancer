@@ -561,8 +561,13 @@
                 formData.append('enhancement_level', document.getElementById('enhancementLevel').value / 100);
             }
 
-            // Show processing
-            enhanceBtn.disabled = true;
+            // Hide input form and show processing
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('fileInfo').style.display = 'none';
+            enhanceBtn.style.display = 'none';
+            document.querySelector('.presets-section').style.display = 'none';
+            document.getElementById('customParams').style.display = 'none';
+            
             document.getElementById('processing').style.display = 'block';
             document.getElementById('resultSection').style.display = 'none';
 
@@ -583,7 +588,6 @@
                 showError('Netzwerkfehler: ' + error.message);
             } finally {
                 document.getElementById('processing').style.display = 'none';
-                enhanceBtn.disabled = false;
             }
         });
 
@@ -619,6 +623,10 @@
                 <a href="${result.download_url}" download="${result.filename}" class="download-btn">
                     ⬇️ Enhanced Audio herunterladen
                 </a>
+                
+                <button onclick="resetForm()" class="enhance-btn" style="margin-top: 20px;">
+                    🎵 Neues Audio verbessern
+                </button>
             `;
             
             resultSection.style.display = 'block';
@@ -631,8 +639,34 @@
             resultSection.classList.add('error');
             document.getElementById('resultTitle').textContent = '❌ Fehler beim Enhancement';
             
-            resultContent.innerHTML = `<p>${message}</p>`;
+            resultContent.innerHTML = `
+                <p>${message}</p>
+                <button onclick="resetForm()" class="enhance-btn" style="margin-top: 20px;">
+                    🔄 Erneut versuchen
+                </button>
+            `;
             resultSection.style.display = 'block';
+        }
+        
+        function resetForm() {
+            // Reset file selection
+            selectedFile = null;
+            document.getElementById('audioInput').value = '';
+            
+            // Show all form elements
+            document.getElementById('uploadSection').style.display = 'flex';
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('enhanceBtn').style.display = 'block';
+            document.getElementById('enhanceBtn').disabled = true;
+            document.querySelector('.presets-section').style.display = 'block';
+            
+            // Show custom params if custom preset is selected
+            if (selectedPreset === 'custom') {
+                document.getElementById('customParams').style.display = 'block';
+            }
+            
+            // Hide results
+            document.getElementById('resultSection').style.display = 'none';
         }
     </script>
 </body>
