@@ -17,14 +17,14 @@ from pydub import AudioSegment
 
 from monitoring import init_database, log_request, get_today_stats, send_daily_summary, get_seconds_until_midnight
 
-# Thread Pool für blockierende Operationen
+# Thread Pool fï¿½r blockierende Operationen
 executor = ThreadPoolExecutor(max_workers=int(os.getenv("MAX_CONCURRENT_ENHANCEMENTS", 5)))
 
 # .env-Datei laden
 load_dotenv()
 
 # FastAPI App initialisieren
-app = FastAPI(title="<µ Audio Enhancer API", version="1.0.0")
+app = FastAPI(title="Audio Enhancer API", version="1.0.0")
 
 # Konfiguration
 AI_COUSTICS_API_KEY = os.getenv("AI_COUSTICS_API_KEY")
@@ -36,35 +36,35 @@ ENHANCED_DIR = Path("data/enhanced")
 # Ensure enhanced directory exists
 ENHANCED_DIR.mkdir(parents=True, exist_ok=True)
 
-# Audio Presets für Social Media
+# Audio Presets fï¿½r Social Media
 AUDIO_PRESETS = {
     "instagram_story": {
         "name": "Instagram Story",
         "loudness_target": -14,
         "loudness_peak": -1,
         "enhancement_level": 0.8,
-        "description": "Optimiert für Instagram Stories"
+        "description": "Optimiert fï¿½r Instagram Stories"
     },
     "youtube": {
         "name": "YouTube",
         "loudness_target": -14,
         "loudness_peak": -1,
         "enhancement_level": 1.0,
-        "description": "YouTube Standard-Lautstärke"
+        "description": "YouTube Standard-Lautstï¿½rke"
     },
     "podcast": {
         "name": "Podcast",
         "loudness_target": -16,
         "loudness_peak": -1,
         "enhancement_level": 1.0,
-        "description": "Optimiert für Podcasts und Sprache"
+        "description": "Optimiert fï¿½r Podcasts und Sprache"
     },
     "tiktok": {
         "name": "TikTok",
         "loudness_target": -14,
         "loudness_peak": -1,
         "enhancement_level": 0.9,
-        "description": "Optimiert für TikTok Videos"
+        "description": "Optimiert fï¿½r TikTok Videos"
     },
     "custom": {
         "name": "Benutzerdefiniert",
@@ -107,7 +107,7 @@ async def startup_event():
     from cleanup import start_cleanup_task
     asyncio.create_task(start_cleanup_task())
 
-# Static Files für Frontend
+# Static Files fï¿½r Frontend
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # CORS-Middleware
