@@ -6,7 +6,7 @@ services:
     container_name: bahmann-audio-enhancer
     restart: unless-stopped
     ports:
-      - "8001:8000"
+      - "8002:8000"
     volumes:
       - ./data:/app/data
       - ./.env:/app/.env
