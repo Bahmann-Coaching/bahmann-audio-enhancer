@@ -20,7 +20,7 @@ from monitoring import init_database, log_request, get_today_stats, send_daily_s
 # .env-Datei laden
 load_dotenv()
 
-# Thread Pool für blockierende Operationen
+# Thread Pool fuer blockierende Operationen
 max_workers = os.getenv("MAX_CONCURRENT_ENHANCEMENTS", "5")
 executor = ThreadPoolExecutor(max_workers=int(max_workers) if max_workers else 5)
 
@@ -37,35 +37,35 @@ ENHANCED_DIR = Path("data/enhanced")
 # Ensure enhanced directory exists
 ENHANCED_DIR.mkdir(parents=True, exist_ok=True)
 
-# Audio Presets f�r Social Media
+# Audio Presets fuer Social Media
 AUDIO_PRESETS = {
     "instagram_story": {
         "name": "Instagram Story",
         "loudness_target": -14,
         "loudness_peak": -1,
         "enhancement_level": 0.8,
-        "description": "Optimiert f�r Instagram Stories"
+        "description": "Optimiert fuer Instagram Stories"
     },
     "youtube": {
         "name": "YouTube",
         "loudness_target": -14,
         "loudness_peak": -1,
         "enhancement_level": 1.0,
-        "description": "YouTube Standard-Lautst�rke"
+        "description": "YouTube Standard-Lautstaerke"
     },
     "podcast": {
         "name": "Podcast",
         "loudness_target": -16,
         "loudness_peak": -1,
         "enhancement_level": 1.0,
-        "description": "Optimiert f�r Podcasts und Sprache"
+        "description": "Optimiert fuer Podcasts und Sprache"
     },
     "tiktok": {
         "name": "TikTok",
         "loudness_target": -14,
         "loudness_peak": -1,
         "enhancement_level": 0.9,
-        "description": "Optimiert f�r TikTok Videos"
+        "description": "Optimiert fuer TikTok Videos"
     },
     "custom": {
         "name": "Benutzerdefiniert",
@@ -108,7 +108,7 @@ async def startup_event():
     from cleanup import start_cleanup_task
     asyncio.create_task(start_cleanup_task())
 
-# Static Files f�r Frontend
+# Static Files fuer Frontend
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # CORS-Middleware

@@ -31,10 +31,10 @@ async def cleanup_old_files():
                     total_size += file_size
         
         if removed_count > 0:
-            print(f">ù Cleanup: Removed {removed_count} files ({total_size / (1024*1024):.2f} MB) older than {STORAGE_DAYS} days")
+            print(f"Cleanup: Removed {removed_count} files ({total_size / (1024*1024):.2f} MB) older than {STORAGE_DAYS} days")
             
     except Exception as e:
-        print(f"L Cleanup error: {e}")
+        print(f"Cleanup error: {e}")
 
 async def start_cleanup_task():
     """Run cleanup task daily at 3 AM"""
@@ -60,7 +60,7 @@ async def start_cleanup_task():
             await asyncio.sleep(60)
             
         except Exception as e:
-            print(f"L Cleanup scheduler error: {e}")
+            print(f"Cleanup scheduler error: {e}")
             # Wait 1 hour before retrying
             await asyncio.sleep(3600)
 
