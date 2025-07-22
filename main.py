@@ -17,11 +17,12 @@ from pydub import AudioSegment
 
 from monitoring import init_database, log_request, get_today_stats, send_daily_summary, get_seconds_until_midnight
 
-# Thread Pool f�r blockierende Operationen
-executor = ThreadPoolExecutor(max_workers=int(os.getenv("MAX_CONCURRENT_ENHANCEMENTS", 5)))
-
 # .env-Datei laden
 load_dotenv()
+
+# Thread Pool für blockierende Operationen
+max_workers = os.getenv("MAX_CONCURRENT_ENHANCEMENTS", "5")
+executor = ThreadPoolExecutor(max_workers=int(max_workers) if max_workers else 5)
 
 # FastAPI App initialisieren
 app = FastAPI(title="Audio Enhancer API", version="1.0.0")
@@ -29,8 +30,8 @@ app = FastAPI(title="Audio Enhancer API", version="1.0.0")
 # Konfiguration
 AI_COUSTICS_API_KEY = os.getenv("AI_COUSTICS_API_KEY")
 AI_COUSTICS_API_URL = "https://api.ai-coustics.io/v1"
-UPLOAD_MAX_SIZE_MB = int(os.getenv("UPLOAD_MAX_SIZE_MB", 100))
-STORAGE_DAYS = int(os.getenv("STORAGE_DAYS", 7))
+UPLOAD_MAX_SIZE_MB = int(os.getenv("UPLOAD_MAX_SIZE_MB", "100") or "100")
+STORAGE_DAYS = int(os.getenv("STORAGE_DAYS", "7") or "7")
 ENHANCED_DIR = Path("data/enhanced")
 
 # Ensure enhanced directory exists
