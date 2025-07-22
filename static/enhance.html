@@ -70,6 +70,10 @@
             transition: all 0.3s ease;
             cursor: pointer;
             background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .upload-section:hover {
@@ -282,6 +286,7 @@
         .result-section h3 {
             margin-bottom: 15px;
             color: var(--success-color);
+            text-align: center;
         }
 
         .result-section.error h3 {
@@ -370,8 +375,10 @@
 
         <div class="card">
             <div class="upload-section" id="uploadSection">
-                <div class="upload-icon">🎵</div>
-                <h2>Audio-Datei hochladen</h2>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="upload-icon">🎵</div>
+                    <h2 style="margin: 0;">Audio-Datei hochladen</h2>
+                </div>
                 <input type="file" id="audioInput" accept="audio/mp3,audio/wav,audio/mpeg" />
                 <button class="upload-btn" onclick="document.getElementById('audioInput').click()">
                     Datei auswählen
@@ -620,13 +627,17 @@
                     Ihr Browser unterstützt das Audio-Element nicht.
                 </audio>
                 
-                <a href="${result.download_url}" download="${result.filename}" class="download-btn">
-                    ⬇️ Enhanced Audio herunterladen
-                </a>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="${result.download_url}" download="${result.filename}" class="download-btn">
+                        ⬇️ Enhanced Audio herunterladen
+                    </a>
+                </div>
                 
-                <button onclick="resetForm()" class="enhance-btn" style="margin-top: 20px;">
-                    🎵 Neues Audio verbessern
-                </button>
+                <div style="text-align: center;">
+                    <button onclick="resetForm()" class="enhance-btn" style="margin-top: 20px;">
+                        🎵 Neues Audio verbessern
+                    </button>
+                </div>
             `;
             
             resultSection.style.display = 'block';
