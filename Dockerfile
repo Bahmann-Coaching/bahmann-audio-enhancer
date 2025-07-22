@@ -20,8 +20,8 @@ COPY . .
 # Create data directories
 RUN mkdir -p data/enhanced
 
-# Expose port
-EXPOSE 8000
+# Expose ports
+EXPOSE 8000 8443
 
-# Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application (will detect SSL and use appropriate port)
+CMD ["python", "main.py"]
