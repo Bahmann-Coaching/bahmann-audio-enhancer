@@ -350,14 +350,12 @@
     <div class="container">
         <div class="header">
             <h1>🎵 Audio Enhancer</h1>
-            <p>Professionelle Audio-Verbesserung für Social Media Content</p>
         </div>
 
         <div class="card">
             <div class="upload-section" id="uploadSection">
                 <div class="upload-icon">🎵</div>
                 <h2>Audio-Datei hochladen</h2>
-                <p>Ziehen Sie eine MP3 oder WAV Datei hierher oder klicken Sie zum Auswählen</p>
                 <input type="file" id="audioInput" accept="audio/mp3,audio/wav,audio/mpeg" />
                 <button class="upload-btn" onclick="document.getElementById('audioInput').click()">
                     Datei auswählen
@@ -370,27 +368,32 @@
             </div>
 
             <div class="presets-section">
-                <h3>Enhancement-Preset wählen:</h3>
+                <h3 style="text-align: center;">Enhancement-Preset wählen:</h3>
                 <div class="preset-grid">
                     <div class="preset-btn" data-preset="instagram_story">
                         <h4>📱 Instagram Story</h4>
                         <p>Optimiert für Stories</p>
+                        <small class="preset-info" style="display: none; color: var(--primary-color); font-weight: 500;">-14 LUFS, -1 dbTP, 80% Enhancement</small>
                     </div>
                     <div class="preset-btn" data-preset="youtube">
                         <h4>📺 YouTube</h4>
                         <p>Standard-Lautstärke</p>
+                        <small class="preset-info" style="display: none; color: var(--primary-color); font-weight: 500;">-14 LUFS, -1 dbTP, 100% Enhancement</small>
                     </div>
                     <div class="preset-btn" data-preset="tiktok">
                         <h4>🎵 TikTok</h4>
                         <p>Für kurze Videos</p>
+                        <small class="preset-info" style="display: none; color: var(--primary-color); font-weight: 500;">-14 LUFS, -1 dbTP, 90% Enhancement</small>
                     </div>
                     <div class="preset-btn" data-preset="podcast">
                         <h4>🎙️ Podcast</h4>
                         <p>Sprach-optimiert</p>
+                        <small class="preset-info" style="display: none; color: var(--primary-color); font-weight: 500;">-16 LUFS, -1 dbTP, 100% Enhancement</small>
                     </div>
                     <div class="preset-btn active" data-preset="custom">
                         <h4>⚙️ Benutzerdefiniert</h4>
                         <p>Eigene Einstellungen</p>
+                        <small class="preset-info" style="display: block; color: var(--primary-color); font-weight: 500;">Manuelle Einstellungen</small>
                     </div>
                 </div>
             </div>
@@ -490,8 +493,18 @@
         // Preset handling
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                // Remove active class and hide all info
+                document.querySelectorAll('.preset-btn').forEach(b => {
+                    b.classList.remove('active');
+                    const info = b.querySelector('.preset-info');
+                    if (info) info.style.display = 'none';
+                });
+                
+                // Add active class and show info for selected
                 btn.classList.add('active');
+                const selectedInfo = btn.querySelector('.preset-info');
+                if (selectedInfo) selectedInfo.style.display = 'block';
+                
                 selectedPreset = btn.dataset.preset;
                 
                 if (selectedPreset === 'custom') {
