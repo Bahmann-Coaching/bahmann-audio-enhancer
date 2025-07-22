@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-STORAGE_DAYS = int(os.getenv("STORAGE_DAYS", 7))
+STORAGE_DAYS = int(os.getenv("STORAGE_DAYS", "7") or "7")
 ENHANCED_DIR = Path("data/enhanced")
 
 async def cleanup_old_files():
