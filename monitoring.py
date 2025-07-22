@@ -27,6 +27,7 @@ async def init_database():
                 processing_time REAL,
                 file_size_mb REAL,
                 error_message TEXT,
+                enhanced_filename TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         """)
@@ -37,6 +38,17 @@ async def init_database():
             ON enhancement_requests(date)
         """)
         
+        # Add enhanced_filename column if it doesn't exist
+        cursor = await db.execute("PRAGMA table_info(enhancement_requests)")
+        columns = await cursor.fetchall()
+        column_names = [col[1] for col in columns]
+        
+        if 'enhanced_filename' not in column_names:
+            await db.execute("""
+                ALTER TABLE enhancement_requests 
+                ADD COLUMN enhanced_filename TEXT
+            """)
+        
         await db.commit()
 
 async def log_request(
@@ -45,7 +57,8 @@ async def log_request(
     duration_seconds: float = 0,
     processing_time: float = 0,
     file_size_mb: float = 0,
-    error: Optional[str] = None
+    error: Optional[str] = None,
+    enhanced_filename: Optional[str] = None
 ):
     """Log an enhancement request to database"""
     try:
@@ -58,10 +71,10 @@ async def log_request(
             await db.execute(
                 """INSERT INTO enhancement_requests 
                    (date, timestamp, success, preset, duration_seconds, 
-                    processing_time, file_size_mb, error_message) 
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    processing_time, file_size_mb, error_message, enhanced_filename) 
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (today, timestamp, success, preset, duration_seconds, 
-                 processing_time, file_size_mb, error)
+                 processing_time, file_size_mb, error, enhanced_filename)
             )
             await db.commit()
             
@@ -205,3 +218,40 @@ def get_seconds_until_midnight():
     now = datetime.now()
     midnight = datetime.combine(now.date() + timedelta(days=1), datetime.min.time())
     return int((midnight - now).total_seconds())
+
+async def get_week_requests():
+    """Get all enhancement requests from the last 7 days"""
+    week_ago = (date.today() - timedelta(days=7)).isoformat()
+    
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        cursor = await db.execute("""
+            SELECT 
+                timestamp,
+                success,
+                preset,
+                duration_seconds,
+                processing_time,
+                file_size_mb,
+                error_message,
+                enhanced_filename
+            FROM enhancement_requests 
+            WHERE date >= ? 
+            ORDER BY timestamp DESC
+            LIMIT 100
+        """, (week_ago,))
+        
+        requests = await cursor.fetchall()
+        
+        return [
+            {
+                "timestamp": row[0],
+                "success": bool(row[1]),
+                "preset": row[2],
+                "duration_seconds": round(row[3] or 0, 1),
+                "processing_time": round(row[4] or 0, 1),
+                "file_size_mb": round(row[5] or 0, 2),
+                "error_message": row[6],
+                "enhanced_filename": row[7] if len(row) > 7 else None
+            }
+            for row in requests
+        ]

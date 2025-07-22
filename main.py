@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 import aiofiles
 from pydub import AudioSegment
 
-from monitoring import init_database, log_request, get_today_stats, send_daily_summary, get_seconds_until_midnight
+from monitoring import init_database, log_request, get_today_stats, send_daily_summary, get_seconds_until_midnight, get_week_requests
 
 # .env-Datei laden
 load_dotenv()
@@ -30,7 +30,7 @@ app = FastAPI(title="Audio Enhancer API", version="1.0.0")
 # Konfiguration
 AI_COUSTICS_API_KEY = os.getenv("AI_COUSTICS_API_KEY")
 AI_COUSTICS_API_URL = "https://api.ai-coustics.io/v1"
-UPLOAD_MAX_SIZE_MB = int(os.getenv("UPLOAD_MAX_SIZE_MB", "100") or "100")
+UPLOAD_MAX_SIZE_MB = int(os.getenv("UPLOAD_MAX_SIZE_MB", "150") or "150")
 STORAGE_DAYS = int(os.getenv("STORAGE_DAYS", "7") or "7")
 ENHANCED_DIR = Path("data/enhanced")
 
@@ -43,35 +43,35 @@ AUDIO_PRESETS = {
         "name": "Instagram Story",
         "loudness_target": -14,
         "loudness_peak": -1,
-        "enhancement_level": 0.8,
+        "enhancement_level": 0.7,
         "description": "Optimiert fuer Instagram Stories"
     },
     "youtube": {
         "name": "YouTube",
         "loudness_target": -14,
         "loudness_peak": -1,
-        "enhancement_level": 1.0,
+        "enhancement_level": 0.7,
         "description": "YouTube Standard-Lautstaerke"
     },
     "podcast": {
         "name": "Podcast",
         "loudness_target": -16,
         "loudness_peak": -1,
-        "enhancement_level": 1.0,
+        "enhancement_level": 0.7,
         "description": "Optimiert fuer Podcasts und Sprache"
     },
     "tiktok": {
         "name": "TikTok",
         "loudness_target": -14,
         "loudness_peak": -1,
-        "enhancement_level": 0.9,
+        "enhancement_level": 0.7,
         "description": "Optimiert fuer TikTok Videos"
     },
     "custom": {
         "name": "Benutzerdefiniert",
         "loudness_target": -14,
         "loudness_peak": -1,
-        "enhancement_level": 1.0,
+        "enhancement_level": 0.7,
         "description": "Eigene Einstellungen"
     }
 }
@@ -328,7 +328,8 @@ async def enhance_audio(
             preset=preset,
             duration_seconds=audio_duration,
             processing_time=processing_time,
-            file_size_mb=len(file_data) / (1024 * 1024)
+            file_size_mb=len(file_data) / (1024 * 1024),
+            enhanced_filename=enhanced_filename
         )
         
         return {
@@ -378,6 +379,11 @@ async def download_enhanced_file(filename: str):
 async def get_stats():
     """Get today's enhancement statistics"""
     return await get_today_stats()
+
+@app.get("/api/week-requests")
+async def get_week_requests_endpoint():
+    """Get all enhancement requests from the last 7 days"""
+    return await get_week_requests()
 
 if __name__ == "__main__":
     import uvicorn

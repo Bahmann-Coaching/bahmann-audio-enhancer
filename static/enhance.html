@@ -368,6 +368,46 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        .requests-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .requests-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .requests-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .success-badge {
+            background-color: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        
+        .error-badge {
+            background-color: var(--error-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 <body>
@@ -442,8 +482,8 @@
 
                 <div class="param-group">
                     <label for="enhancementLevel">Enhancement-Level:</label>
-                    <input type="range" id="enhancementLevel" min="0" max="100" value="100" />
-                    <div class="param-value" id="enhancementLevelValue">100%</div>
+                    <input type="range" id="enhancementLevel" min="0" max="100" value="70" />
+                    <div class="param-value" id="enhancementLevelValue">70%</div>
                 </div>
             </div>
 
@@ -456,6 +496,12 @@
             <div class="result-section" id="resultSection">
                 <h3 id="resultTitle">✅ Enhancement erfolgreich!</h3>
                 <div id="resultContent"></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3 style="text-align: center; margin-bottom: 20px;">Letzte Woche - Alle Anfragen</h3>
+            <div id="weekRequests" style="max-height: 400px; overflow-y: auto;">
+                <p style="text-align: center; color: #666;">Lade Anfragen...</p>
             </div>
         </div>
     </div>
@@ -679,6 +725,74 @@
             // Hide results
             document.getElementById('resultSection').style.display = 'none';
         }
+        
+        // Load week requests
+        async function loadWeekRequests() {
+            try {
+                const response = await fetch('/api/week-requests');
+                const requests = await response.json();
+                
+                const weekRequestsDiv = document.getElementById('weekRequests');
+                
+                if (requests.length === 0) {
+                    weekRequestsDiv.innerHTML = '<p style="text-align: center; color: #666;">Keine Anfragen in den letzten 7 Tagen</p>';
+                    return;
+                }
+                
+                let tableHTML = `
+                    <table class="requests-table">
+                        <thead>
+                            <tr>
+                                <th>Zeitstempel</th>
+                                <th>Status</th>
+                                <th>Preset</th>
+                                <th>Audio-Dauer</th>
+                                <th>Bearbeitungszeit</th>
+                                <th>Dateigröße</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                requests.forEach(req => {
+                    const timestamp = new Date(req.timestamp).toLocaleString('de-DE');
+                    const status = req.success ? 
+                        '<span class="success-badge">Erfolgreich</span>' : 
+                        '<span class="error-badge">Fehler</span>';
+                    
+                    const downloadButton = req.success && req.enhanced_filename ? 
+                        `<a href="/api/download/${req.enhanced_filename}" download class="download-btn" style="padding: 4px 12px; font-size: 0.85em;">⬇️ Herunterladen</a>` : 
+                        '-';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td>${timestamp}</td>
+                            <td>${status}</td>
+                            <td>${req.preset}</td>
+                            <td>${req.duration_seconds}s</td>
+                            <td>${req.processing_time}s</td>
+                            <td>${req.file_size_mb} MB</td>
+                            <td style="text-align: center;">${downloadButton}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += '</tbody></table>';
+                weekRequestsDiv.innerHTML = tableHTML;
+                
+            } catch (error) {
+                console.error('Error loading week requests:', error);
+                document.getElementById('weekRequests').innerHTML = 
+                    '<p style="text-align: center; color: #f44336;">Fehler beim Laden der Anfragen</p>';
+            }
+        }
+        
+        // Load requests on page load
+        loadWeekRequests();
+        
+        // Refresh every 30 seconds
+        setInterval(loadWeekRequests, 30000);
     </script>
 </body>
 </html>
