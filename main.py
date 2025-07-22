@@ -193,19 +193,31 @@ async def enhance_audio_with_ai_coustics(
                 if not generated_name:
                     raise HTTPException(status_code=500, detail="No file name returned from API")
                 
-                # Download the enhanced file
-                download_response = await client.get(
-                    f"{AI_COUSTICS_API_URL}/media/{generated_name}",
-                    headers={"X-API-Key": AI_COUSTICS_API_KEY}
-                )
+                # Wait for processing to complete with polling
+                max_attempts = 60  # 60 attempts
+                wait_time = 2  # 2 seconds between attempts
                 
-                if download_response.status_code == 200:
-                    return download_response.content, generated_name
-                else:
-                    raise HTTPException(
-                        status_code=download_response.status_code,
-                        detail=f"Failed to download enhanced file: {download_response.text}"
+                for attempt in range(max_attempts):
+                    # Try to download the enhanced file
+                    download_response = await client.get(
+                        f"{AI_COUSTICS_API_URL}/media/{generated_name}",
+                        headers={"X-API-Key": AI_COUSTICS_API_KEY}
                     )
+                    
+                    if download_response.status_code == 200:
+                        return download_response.content, generated_name
+                    elif download_response.status_code == 412:
+                        # File not ready yet, wait and retry
+                        await asyncio.sleep(wait_time)
+                        continue
+                    else:
+                        raise HTTPException(
+                            status_code=download_response.status_code,
+                            detail=f"Failed to download enhanced file: {download_response.text}"
+                        )
+                
+                # If we get here, processing took too long
+                raise HTTPException(status_code=504, detail="Enhancement timeout. Processing took too long.")
                     
             else:
                 error_detail = response.text
