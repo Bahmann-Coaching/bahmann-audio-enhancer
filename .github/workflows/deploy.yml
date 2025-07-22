@@ -97,23 +97,29 @@ jobs:
                 echo "SLACK_CHANNEL=${{ secrets.SLACK_CHANNEL }}" >> .env
             fi
 
-            # Server Configuration
-            if grep -q "UPLOAD_MAX_SIZE_MB=" .env; then
-                sed -i "s|UPLOAD_MAX_SIZE_MB=.*|UPLOAD_MAX_SIZE_MB=${{ secrets.UPLOAD_MAX_SIZE_MB }}|" .env
-            else
-                echo "UPLOAD_MAX_SIZE_MB=${{ secrets.UPLOAD_MAX_SIZE_MB }}" >> .env
+            # Server Configuration - nur setzen wenn Secrets vorhanden sind
+            if [ -n "${{ secrets.UPLOAD_MAX_SIZE_MB }}" ]; then
+                if grep -q "UPLOAD_MAX_SIZE_MB=" .env; then
+                    sed -i "s|UPLOAD_MAX_SIZE_MB=.*|UPLOAD_MAX_SIZE_MB=${{ secrets.UPLOAD_MAX_SIZE_MB }}|" .env
+                else
+                    echo "UPLOAD_MAX_SIZE_MB=${{ secrets.UPLOAD_MAX_SIZE_MB }}" >> .env
+                fi
             fi
             
-            if grep -q "STORAGE_DAYS=" .env; then
-                sed -i "s|STORAGE_DAYS=.*|STORAGE_DAYS=${{ secrets.STORAGE_DAYS }}|" .env
-            else
-                echo "STORAGE_DAYS=${{ secrets.STORAGE_DAYS }}" >> .env
+            if [ -n "${{ secrets.STORAGE_DAYS }}" ]; then
+                if grep -q "STORAGE_DAYS=" .env; then
+                    sed -i "s|STORAGE_DAYS=.*|STORAGE_DAYS=${{ secrets.STORAGE_DAYS }}|" .env
+                else
+                    echo "STORAGE_DAYS=${{ secrets.STORAGE_DAYS }}" >> .env
+                fi
             fi
             
-            if grep -q "MAX_CONCURRENT_ENHANCEMENTS=" .env; then
-                sed -i "s|MAX_CONCURRENT_ENHANCEMENTS=.*|MAX_CONCURRENT_ENHANCEMENTS=${{ secrets.MAX_CONCURRENT_ENHANCEMENTS }}|" .env
-            else
-                echo "MAX_CONCURRENT_ENHANCEMENTS=${{ secrets.MAX_CONCURRENT_ENHANCEMENTS }}" >> .env
+            if [ -n "${{ secrets.MAX_CONCURRENT_ENHANCEMENTS }}" ]; then
+                if grep -q "MAX_CONCURRENT_ENHANCEMENTS=" .env; then
+                    sed -i "s|MAX_CONCURRENT_ENHANCEMENTS=.*|MAX_CONCURRENT_ENHANCEMENTS=${{ secrets.MAX_CONCURRENT_ENHANCEMENTS }}|" .env
+                else
+                    echo "MAX_CONCURRENT_ENHANCEMENTS=${{ secrets.MAX_CONCURRENT_ENHANCEMENTS }}" >> .env
+                fi
             fi
 
             # Ensure Docker Compose V2 is installed
