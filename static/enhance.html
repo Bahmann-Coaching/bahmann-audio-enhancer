@@ -747,7 +747,6 @@
                                 <th>Status</th>
                                 <th>Preset</th>
                                 <th>Audio-Dauer</th>
-                                <th>Bearbeitungszeit</th>
                                 <th>Dateigröße</th>
                                 <th>Download</th>
                             </tr>
@@ -762,7 +761,7 @@
                         '<span class="error-badge">Fehler</span>';
                     
                     const downloadButton = req.success && req.enhanced_filename ? 
-                        `<a href="/api/download/${req.enhanced_filename}" download class="download-btn" style="padding: 4px 12px; font-size: 0.85em;">⬇️ Herunterladen</a>` : 
+                        `<a href="/api/download/${req.enhanced_filename}" download class="download-btn" style="padding: 4px 12px; font-size: 0.85em;">⬇️ Download</a>` : 
                         '-';
                     
                     tableHTML += `
@@ -771,7 +770,6 @@
                             <td>${status}</td>
                             <td>${req.preset}</td>
                             <td>${req.duration_seconds}s</td>
-                            <td>${req.processing_time}s</td>
                             <td>${req.file_size_mb} MB</td>
                             <td style="text-align: center;">${downloadButton}</td>
                         </tr>

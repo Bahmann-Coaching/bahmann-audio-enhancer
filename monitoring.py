@@ -221,6 +221,9 @@ def get_seconds_until_midnight():
 
 async def get_week_requests():
     """Get all enhancement requests from the last 7 days"""
+    import os
+    from pathlib import Path
+    
     week_ago = (date.today() - timedelta(days=7)).isoformat()
     
     async with aiosqlite.connect(DATABASE_PATH) as db:
@@ -242,8 +245,27 @@ async def get_week_requests():
         
         requests = await cursor.fetchall()
         
-        return [
-            {
+        # Check for existing files in enhanced directory
+        enhanced_dir = Path("data/enhanced")
+        existing_files = set()
+        if enhanced_dir.exists():
+            existing_files = {f.name for f in enhanced_dir.glob("enhanced_*.mp3")}
+            existing_files.update({f.name for f in enhanced_dir.glob("enhanced_*.wav")})
+        
+        results = []
+        for row in requests:
+            enhanced_filename = row[7] if len(row) > 7 else None
+            
+            # If no filename stored but request was successful, try to find file
+            if not enhanced_filename and row[1]:  # row[1] is success
+                # Try to find a file that matches the timestamp
+                timestamp_str = row[0].replace(':', '').replace('-', '').replace('T', '_').split('.')[0]
+                for file in existing_files:
+                    if timestamp_str[:15] in file:  # Match by partial timestamp
+                        enhanced_filename = file
+                        break
+            
+            results.append({
                 "timestamp": row[0],
                 "success": bool(row[1]),
                 "preset": row[2],
@@ -251,7 +273,7 @@ async def get_week_requests():
                 "processing_time": round(row[4] or 0, 1),
                 "file_size_mb": round(row[5] or 0, 2),
                 "error_message": row[6],
-                "enhanced_filename": row[7] if len(row) > 7 else None
-            }
-            for row in requests
-        ]
+                "enhanced_filename": enhanced_filename
+            })
+        
+        return results
