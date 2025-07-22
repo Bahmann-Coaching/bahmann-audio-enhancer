@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Audio Enhancer - ai-coustics</title>
+    <style>
+        :root {
+            --primary-color: #5e35b1;
+            --primary-dark: #4527a0;
+            --secondary-color: #7c4dff;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background-color: #fafafa;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary-color);
+            background-color: #f3e5f5;
+        }
+
+        .upload-section.dragover {
+            border-color: var(--secondary-color);
+            background-color: #ede7f6;
+            transform: scale(1.02);
+        }
+
+        #audioInput {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .upload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .upload-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(94, 53, 177, 0.3);
+        }
+
+        .upload-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-info {
+            display: none;
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .file-info strong {
+            color: var(--primary-color);
+        }
+
+        .presets-section {
+            margin-top: 30px;
+        }
+
+        .presets-section h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .preset-btn.active {
+            border-color: var(--primary-color);
+            background-color: #ede7f6;
+        }
+
+        .preset-btn h4 {
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .preset-btn p {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .custom-params {
+            display: none;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .param-group {
+            margin-bottom: 20px;
+        }
+
+        .param-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .param-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .param-value {
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .enhance-btn {
+            background-color: var(--success-color);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .enhance-btn:hover:not(:disabled) {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .enhance-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .processing {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            background-color: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .result-section.error {
+            background-color: #ffebee;
+        }
+
+        .result-section h3 {
+            margin-bottom: 15px;
+            color: var(--success-color);
+        }
+
+        .result-section.error h3 {
+            color: var(--error-color);
+        }
+
+        .audio-player {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .download-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(94, 53, 177, 0.3);
+        }
+
+        .stats-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-item strong {
+            display: block;
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+
+        .stat-item span {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .preset-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Audio Enhancer</h1>
+            <p>Professionelle Audio-Verbesserung für Social Media Content</p>
+        </div>
+
+        <div class="card">
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-icon">🎵</div>
+                <h2>Audio-Datei hochladen</h2>
+                <p>Ziehen Sie eine MP3 oder WAV Datei hierher oder klicken Sie zum Auswählen</p>
+                <input type="file" id="audioInput" accept="audio/mp3,audio/wav,audio/mpeg" />
+                <button class="upload-btn" onclick="document.getElementById('audioInput').click()">
+                    Datei auswählen
+                </button>
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <strong>Ausgewählte Datei:</strong> <span id="fileName"></span><br>
+                <strong>Größe:</strong> <span id="fileSize"></span>
+            </div>
+
+            <div class="presets-section">
+                <h3>Enhancement-Preset wählen:</h3>
+                <div class="preset-grid">
+                    <div class="preset-btn" data-preset="instagram_story">
+                        <h4>📱 Instagram Story</h4>
+                        <p>Optimiert für Stories</p>
+                    </div>
+                    <div class="preset-btn" data-preset="youtube">
+                        <h4>📺 YouTube</h4>
+                        <p>Standard-Lautstärke</p>
+                    </div>
+                    <div class="preset-btn" data-preset="tiktok">
+                        <h4>🎵 TikTok</h4>
+                        <p>Für kurze Videos</p>
+                    </div>
+                    <div class="preset-btn" data-preset="podcast">
+                        <h4>🎙️ Podcast</h4>
+                        <p>Sprach-optimiert</p>
+                    </div>
+                    <div class="preset-btn active" data-preset="custom">
+                        <h4>⚙️ Benutzerdefiniert</h4>
+                        <p>Eigene Einstellungen</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="custom-params" id="customParams">
+                <h3>Benutzerdefinierte Einstellungen:</h3>
+                
+                <div class="param-group">
+                    <label for="loudnessTarget">Ziel-Lautstärke (LUFS):</label>
+                    <input type="range" id="loudnessTarget" min="-70" max="-5" value="-14" />
+                    <div class="param-value" id="loudnessTargetValue">-14 LUFS</div>
+                </div>
+
+                <div class="param-group">
+                    <label for="loudnessPeak">Peak-Limit (dbTP):</label>
+                    <input type="range" id="loudnessPeak" min="-9" max="0" value="-1" />
+                    <div class="param-value" id="loudnessPeakValue">-1 dbTP</div>
+                </div>
+
+                <div class="param-group">
+                    <label for="enhancementLevel">Enhancement-Level:</label>
+                    <input type="range" id="enhancementLevel" min="0" max="100" value="100" />
+                    <div class="param-value" id="enhancementLevelValue">100%</div>
+                </div>
+            </div>
+
+            <button class="enhance-btn" id="enhanceBtn" disabled>
+                🎵 Audio verbessern
+            </button>
+
+            <div class="processing" id="processing">
+                <div class="spinner"></div>
+                <h3>Audio wird verarbeitet...</h3>
+                <p>Dies kann je nach Dateigröße einige Momente dauern.</p>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <h3 id="resultTitle">✅ Enhancement erfolgreich!</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let selectedPreset = 'custom';
+
+        // Drag and Drop
+        const uploadSection = document.getElementById('uploadSection');
+        const audioInput = document.getElementById('audioInput');
+        const enhanceBtn = document.getElementById('enhanceBtn');
+
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('audio/')) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        audioInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('audio/')) {
+                alert('Bitte wählen Sie eine Audio-Datei (MP3 oder WAV)');
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('fileInfo').style.display = 'block';
+            enhanceBtn.disabled = false;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Preset handling
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedPreset = btn.dataset.preset;
+                
+                if (selectedPreset === 'custom') {
+                    document.getElementById('customParams').style.display = 'block';
+                } else {
+                    document.getElementById('customParams').style.display = 'none';
+                }
+            });
+        });
+
+        // Custom parameter sliders
+        document.getElementById('loudnessTarget').addEventListener('input', (e) => {
+            document.getElementById('loudnessTargetValue').textContent = e.target.value + ' LUFS';
+        });
+
+        document.getElementById('loudnessPeak').addEventListener('input', (e) => {
+            document.getElementById('loudnessPeakValue').textContent = e.target.value + ' dbTP';
+        });
+
+        document.getElementById('enhancementLevel').addEventListener('input', (e) => {
+            document.getElementById('enhancementLevelValue').textContent = e.target.value + '%';
+        });
+
+        // Show custom params by default
+        document.getElementById('customParams').style.display = 'block';
+
+        // Enhance button
+        enhanceBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('preset', selectedPreset);
+
+            if (selectedPreset === 'custom') {
+                formData.append('loudness_target', document.getElementById('loudnessTarget').value);
+                formData.append('loudness_peak', document.getElementById('loudnessPeak').value);
+                formData.append('enhancement_level', document.getElementById('enhancementLevel').value / 100);
+            }
+
+            // Show processing
+            enhanceBtn.disabled = true;
+            document.getElementById('processing').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/enhance', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showSuccess(result);
+                } else {
+                    showError(result.detail || 'Enhancement fehlgeschlagen');
+                }
+            } catch (error) {
+                showError('Netzwerkfehler: ' + error.message);
+            } finally {
+                document.getElementById('processing').style.display = 'none';
+                enhanceBtn.disabled = false;
+            }
+        });
+
+        function showSuccess(result) {
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultSection.classList.remove('error');
+            document.getElementById('resultTitle').textContent = '✅ Enhancement erfolgreich!';
+            
+            resultContent.innerHTML = `
+                <div class="stats-info">
+                    <div class="stat-item">
+                        <strong>${result.audio_duration}s</strong>
+                        <span>Audio-Länge</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>${result.processing_time}s</strong>
+                        <span>Bearbeitungszeit</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>${result.preset_used}</strong>
+                        <span>Preset</span>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top: 20px;">Enhanced Audio:</h4>
+                <audio controls class="audio-player">
+                    <source src="${result.download_url}" type="audio/mpeg">
+                    Ihr Browser unterstützt das Audio-Element nicht.
+                </audio>
+                
+                <a href="${result.download_url}" download="${result.filename}" class="download-btn">
+                    ⬇️ Enhanced Audio herunterladen
+                </a>
+            `;
+            
+            resultSection.style.display = 'block';
+        }
+
+        function showError(message) {
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultSection.classList.add('error');
+            document.getElementById('resultTitle').textContent = '❌ Fehler beim Enhancement';
+            
+            resultContent.innerHTML = `<p>${message}</p>`;
+            resultSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

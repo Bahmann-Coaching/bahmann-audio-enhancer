@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  audio-enhancer:
+    build: .
+    container_name: bahmann-audio-enhancer
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env
+    environment:
+      - TZ=Europe/Berlin
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"

@@ -1,0 +1,42 @@
+name: Deploy Audio Enhancer
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests (if any)
+      run: |
+        # Add tests here when available
+        echo "No tests configured yet"
+    
+    - name: Build Docker image
+      run: |
+        docker build -t bahmann-audio-enhancer .
+    
+    - name: Deploy notification
+      if: success()
+      run: |
+        echo "Deployment successful! 🎉"
+        echo "Remember to:"
+        echo "1. Set up GitHub Secrets for production deployment"
+        echo "2. Configure AI_COUSTICS_API_KEY secret"
+        echo "3. Configure SLACK_WEBHOOK_URL secret (optional)"
+        echo "4. Deploy to your server using Docker Compose"
