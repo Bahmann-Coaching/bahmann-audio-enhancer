@@ -465,16 +465,15 @@
                 </div>
             </div>
             
-            <div class="model-selection" style="text-align: center; margin-top: 20px;">
-                <h4 style="margin-bottom: 10px;">Modell:</h4>
-                <label style="margin-right: 20px; cursor: pointer;">
-                    <input type="radio" name="model" value="FINCH" checked style="margin-right: 5px;">
-                    Finch
-                </label>
-                <label style="cursor: pointer;">
-                    <input type="radio" name="model" value="LARK" style="margin-right: 5px;">
-                    Lark
-                </label>
+            <div class="model-selection" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <div class="preset-btn model-btn active" data-model="FINCH" style="width: 100px; min-height: 50px; padding: 8px;">
+                        <h4 style="margin: 0;">Finch</h4>
+                    </div>
+                    <div class="preset-btn model-btn" data-model="LARK" style="width: 100px; min-height: 50px; padding: 8px;">
+                        <h4 style="margin: 0;">Lark</h4>
+                    </div>
+                </div>
             </div>
 
             <div class="custom-params" id="customParams">
@@ -611,6 +610,16 @@
 
         // Show custom params by default
         document.getElementById('customParams').style.display = 'block';
+        
+        // Model selection handling
+        let selectedModel = 'FINCH';
+        document.querySelectorAll('.model-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedModel = btn.dataset.model;
+            });
+        });
 
         // Enhance button
         enhanceBtn.addEventListener('click', async () => {
@@ -620,8 +629,7 @@
             formData.append('file', selectedFile);
             formData.append('preset', selectedPreset);
             
-            // Get selected model
-            const selectedModel = document.querySelector('input[name="model"]:checked').value;
+            // Add selected model
             formData.append('model_arch', selectedModel);
 
             if (selectedPreset === 'custom') {
