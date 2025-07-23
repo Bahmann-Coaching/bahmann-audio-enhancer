@@ -147,7 +147,8 @@ async def enhance_audio_with_ai_coustics(
     file_data: bytes,
     file_type: str,
     preset: str = "custom",
-    custom_params: Optional[dict] = None
+    custom_params: Optional[dict] = None,
+    model_arch: str = "FINCH"
 ) -> tuple[bytes, str]:
     """Call ai-coustics API to enhance audio"""
     
@@ -170,6 +171,9 @@ async def enhance_audio_with_ai_coustics(
     # Determine output format
     output_format = "MP3" if "mp3" in file_type.lower() else "WAV"
     params["transcode_kind"] = output_format
+    
+    # Add model architecture
+    params["model_arch"] = model_arch
     
     async with httpx.AsyncClient(timeout=300.0) as client:  # 5 minute timeout
         try:
@@ -255,7 +259,8 @@ async def enhance_audio(
     preset: str = Form("custom"),
     loudness_target: Optional[int] = Form(None),
     loudness_peak: Optional[int] = Form(None),
-    enhancement_level: Optional[float] = Form(None)
+    enhancement_level: Optional[float] = Form(None),
+    model_arch: str = Form("FINCH")
 ):
     """Enhance audio file endpoint"""
     
@@ -303,7 +308,8 @@ async def enhance_audio(
             file_data,
             file.content_type,
             preset,
-            custom_params
+            custom_params,
+            model_arch
         )
         
         # Generate filename for storage
@@ -325,7 +331,7 @@ async def enhance_audio(
         # Log successful request
         await log_request(
             success=True,
-            preset=preset,
+            preset=f"{preset} ({model_arch})",
             duration_seconds=audio_duration,
             processing_time=processing_time,
             file_size_mb=len(file_data) / (1024 * 1024),

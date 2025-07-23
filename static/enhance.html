@@ -464,6 +464,18 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="model-selection" style="text-align: center; margin-top: 20px;">
+                <h4 style="margin-bottom: 10px;">Modell:</h4>
+                <label style="margin-right: 20px; cursor: pointer;">
+                    <input type="radio" name="model" value="FINCH" checked style="margin-right: 5px;">
+                    Finch
+                </label>
+                <label style="cursor: pointer;">
+                    <input type="radio" name="model" value="LARK" style="margin-right: 5px;">
+                    Lark
+                </label>
+            </div>
 
             <div class="custom-params" id="customParams">
                 <h4 style="margin-bottom: 10px;">Benutzerdefinierte Einstellungen:</h4>
@@ -607,6 +619,10 @@
             const formData = new FormData();
             formData.append('file', selectedFile);
             formData.append('preset', selectedPreset);
+            
+            // Get selected model
+            const selectedModel = document.querySelector('input[name="model"]:checked').value;
+            formData.append('model_arch', selectedModel);
 
             if (selectedPreset === 'custom') {
                 formData.append('loudness_target', document.getElementById('loudnessTarget').value);
