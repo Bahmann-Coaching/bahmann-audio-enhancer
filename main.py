@@ -148,7 +148,7 @@ async def enhance_audio_with_ai_coustics(
     file_type: str,
     preset: str = "custom",
     custom_params: Optional[dict] = None,
-    model_arch: str = "FINCH"
+    model_arch: str = "LARK"
 ) -> tuple[bytes, str]:
     """Call ai-coustics API to enhance audio"""
     
@@ -260,7 +260,7 @@ async def enhance_audio(
     loudness_target: Optional[int] = Form(None),
     loudness_peak: Optional[int] = Form(None),
     enhancement_level: Optional[float] = Form(None),
-    model_arch: str = Form("FINCH")
+    model_arch: str = Form("LARK")
 ):
     """Enhance audio file endpoint"""
     

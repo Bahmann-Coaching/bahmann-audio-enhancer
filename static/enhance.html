@@ -467,11 +467,12 @@
             
             <div class="model-selection" style="margin-top: 20px;">
                 <div style="display: flex; justify-content: center; gap: 10px;">
-                    <div class="preset-btn model-btn active" data-model="FINCH" style="width: 100px; min-height: 50px; padding: 8px;">
+                    <div class="preset-btn model-btn" data-model="FINCH" style="width: 100px; min-height: 50px; padding: 8px;">
                         <h4 style="margin: 0;">Finch</h4>
                     </div>
-                    <div class="preset-btn model-btn" data-model="LARK" style="width: 100px; min-height: 50px; padding: 8px;">
+                    <div class="preset-btn model-btn active" data-model="LARK" style="width: 100px; min-height: 50px; padding: 8px;">
                         <h4 style="margin: 0;">Lark</h4>
+                        <p style="font-size: 0.75em; color: var(--text-secondary); margin: 2px 0 0 0;">Empfohlen</p>
                     </div>
                 </div>
             </div>
@@ -612,7 +613,7 @@
         document.getElementById('customParams').style.display = 'block';
         
         // Model selection handling (separate from preset selection)
-        let selectedModel = 'FINCH';
+        let selectedModel = 'LARK';
         document.querySelectorAll('.model-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 // Only remove active from model buttons, not preset buttons
