@@ -571,10 +571,10 @@
         }
 
         // Preset handling
-        document.querySelectorAll('.preset-btn').forEach(btn => {
+        document.querySelectorAll('.preset-btn:not(.model-btn)').forEach(btn => {
             btn.addEventListener('click', () => {
-                // Remove active class and hide all info
-                document.querySelectorAll('.preset-btn').forEach(b => {
+                // Remove active class and hide all info only from preset buttons
+                document.querySelectorAll('.preset-btn:not(.model-btn)').forEach(b => {
                     b.classList.remove('active');
                     const info = b.querySelector('.preset-info');
                     if (info) info.style.display = 'none';
@@ -611,10 +611,11 @@
         // Show custom params by default
         document.getElementById('customParams').style.display = 'block';
         
-        // Model selection handling
+        // Model selection handling (separate from preset selection)
         let selectedModel = 'FINCH';
         document.querySelectorAll('.model-btn').forEach(btn => {
             btn.addEventListener('click', () => {
+                // Only remove active from model buttons, not preset buttons
                 document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 selectedModel = btn.dataset.model;
